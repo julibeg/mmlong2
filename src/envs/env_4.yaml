@@ -4,4 +4,4 @@ channels:
   - bioconda
 dependencies:
   - metamdbg=1.2
-  - myloasm=0.2.0
+  - myloasm=0.5.1
