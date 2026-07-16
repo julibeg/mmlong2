@@ -959,7 +959,7 @@ rule Binning_binette:
         if [ -d "{loc}/{sample}/tmp/binning/round_{params.round}/binette" ]; then rm -r {loc}/{sample}/tmp/binning/round_{params.round}/binette; fi
         export PYTHONHASHSEED={params.seed}
         dir={loc}/{sample}/tmp/binning/round_{params.round}
-        binette -d $dir/vamb/bins $dir/metabat2 $dir/semibin/output_bins -c {input.asm} -o $dir/binette -w {params.weight} -m {params.compl} -t {threads}
+        binette -d $dir/vamb/bins $dir/metabat2 $dir/semibin/output_bins -c {input.asm} -o $dir/binette -w {params.weight} --min_completeness {params.compl} -t {threads}
         if ! grep -q "binette" {loc}/{sample}/tmp/dep_mmlong2-lite.csv; then conda list | grep -w "binette " | tr -s ' ' | awk '{{print $1","$2}}' >> {loc}/{sample}/tmp/dep_mmlong2-lite.csv; fi  
         """
 
@@ -1012,8 +1012,24 @@ rule Binning_qc:
         if [ $(basename {input}) == "final_bins_quality_reports.tsv" ];
         then
             rsync {params.dir}/*.fa {loc}/{sample}/tmp/binning/round_{params.round}/bins_innit/.
-            for bin in {loc}/{sample}/tmp/binning/round_{params.round}/bins_innit/*.fa; do mv "$bin" "$(dirname "$bin")/{sample}.bin.{params.round}.$(basename "$bin" | sed 's/^bin_//')"; done
-            cut -f1,4,5 {input} | sed 's/^/{sample}.bin.{params.round}./' > {output};
+            for bin in {loc}/{sample}/tmp/binning/round_{params.round}/bins_innit/*.fa; do mv "$bin" "$(dirname "$bin")/{sample}.bin.{params.round}.$(basename "$bin" | sed -E 's/^(bin_|binette_bin)//')"; done
+            awk -F "\t" -v OFS="\t" -v prefix="{sample}.bin.{params.round}." '
+            NR == 1 {{
+                for (i = 1; i <= NF; i++) col[$i] = i
+                id = col["bin_id"] ? col["bin_id"] : col["name"]
+                completeness = col["completeness"]
+                contamination = col["contamination"]
+                if (!id || !completeness || !contamination) exit 1
+                print prefix "bin_id", "completeness", "contamination"
+                next
+            }}
+            {{
+                name = $id
+                sub(/^binette_bin/, "", name)
+                sub(/^bin_/, "", name)
+                print prefix name, $completeness, $contamination
+            }}
+            END {{ if (NR == 0) exit 1 }}' {input} > {output};
         else
             n=1 && for i in {params.dir}/*.fa; do rsync $i {loc}/{sample}/tmp/binning/round_{params.round}/bins_innit/{sample}.bin.{params.round}.${{n}}.fa && n=$(($n+1)); done
             checkm2 predict -x .fa -i {loc}/{sample}/tmp/binning/round_{params.round}/bins_innit -o {loc}/{sample}/tmp/binning/round_{params.round}/checkm2 -t {threads}
