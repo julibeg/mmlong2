@@ -426,7 +426,7 @@ rule Curation_screening:
         os.path.join(loc, sample, "tmp/logs/usage_curation_screening.tsv")
     shell:
         """
-        if [ "{params.apptainer}" == "FALSE" ]; then if ! command -v bam_error_detector &> /dev/null; then cargo install --git https://github.com/bluenote-1577/rust-anvio-mis --root $CONDA_DEFAULT_ENV; fi; fi
+        if [ "{params.apptainer}" == "FALSE" ]; then if ! command -v bam_error_detector &> /dev/null; then cargo install --locked --git https://github.com/bluenote-1577/rust-anvio-mis --root $CONDA_DEFAULT_ENV; fi; fi
 
         org_dir=$(pwd) && cd {loc}/{sample}/tmp/curation
         bam_error_detector --clipping-ratio {params.clip_ratio} --min-dist-to-end {params.min_dist} {input} errors
