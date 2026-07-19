@@ -11,3 +11,4 @@ dependencies:
   - boost=1.85
   - rust=1.88.0
   - cmake
+  - git
