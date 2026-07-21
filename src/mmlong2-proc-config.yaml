@@ -20,7 +20,6 @@ dl_gtdb: https://data.ace.uq.edu.au/public/gtdb/data/releases/release226/226.0/a
 dl_rrna: https://zenodo.org/records/17174373/files/greengenes2_2024.09.udb.gz
 dl_metabuli: https://hulk.mmseqs.com/jaebeom/gtdb226db/
 dl_gunc: https://swifter.embl.de/~fullam/gunc/gunc_db_progenomes2.1.dmnd.gz
-link_metabuli: https://dev.mmseqs.com/metabuli/metabuli-linux-avx2.tar.gz
 min_len_ssu: 500
 min_id_ssu: 0.75
 ssu: 16S

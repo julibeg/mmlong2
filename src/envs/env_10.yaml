@@ -6,3 +6,4 @@ dependencies:
   - barrnap=0.9
   - r-base=4.4.2
   - usearch=12.0_beta
+  - metabuli=1.2.0

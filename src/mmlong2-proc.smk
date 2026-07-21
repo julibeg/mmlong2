@@ -675,7 +675,6 @@ rule Taxonomy_contigs:
         res_filt=os.path.join(loc, sample, "tmp/taxa/metabuli/metabuli_c.tsv")
     params:
         db=config["db_metabuli"],
-        link=config["link_metabuli"],
         apptainer=config["apptainer_status"],
     benchmark:
         os.path.join(loc, sample, "tmp/logs/usage_taxonomy_metabuli.tsv")
@@ -685,15 +684,18 @@ rule Taxonomy_contigs:
         """
         if [ ! -d "{loc}/{sample}/tmp/taxa" ]; then mkdir {loc}/{sample}/tmp/taxa; fi
         if [ -d "{loc}/{sample}/tmp/taxa/metabuli" ]; then rm -r {loc}/{sample}/tmp/taxa/metabuli; fi
-        if [ "{params.apptainer}" == "FALSE" ]; then if [ ! -d $CONDA_PREFIX/metabuli ]; then wget -qO- {params.link} | tar xvz && mv metabuli $CONDA_PREFIX/.; fi; fi
+        if [ "{params.apptainer}" == "FALSE" ]; then metabuli_bin="$CONDA_PREFIX/bin/metabuli"; else metabuli_bin="$CONDA_PREFIX/metabuli/bin/metabuli"; fi
 
-        $CONDA_PREFIX/metabuli/bin/metabuli classify {input} {params.db} {loc}/{sample}/tmp/taxa/metabuli contigs --threads {threads} --seq-mode 3 --lineage 1
+        "$metabuli_bin" classify {input} {params.db} {loc}/{sample}/tmp/taxa/metabuli contigs --threads {threads} --seq-mode 3 --lineage 1
         cut -f2,7 {output.res} > {output.res_filt}
 
         if grep -q "metabuli," {loc}/{sample}/tmp/db_mmlong2-proc.csv; then sed -i '/metabuli,/d' {loc}/{sample}/tmp/db_mmlong2-proc.csv; fi
         echo "metabuli,{params.db}" >> {loc}/{sample}/tmp/db_mmlong2-proc.csv
-        version=$(grep "### Update in" $CONDA_PREFIX/metabuli/README.md | cut -f4 -d" " | head -1)
-        if ! grep -q "metabuli" {loc}/{sample}/tmp/dep_mmlong2-proc.csv; then echo "metabuli,${{version}}" >> {loc}/{sample}/tmp/dep_mmlong2-proc.csv; fi  
+        if ! grep -q "^metabuli," {loc}/{sample}/tmp/dep_mmlong2-proc.csv; then
+            version=$("$metabuli_bin" -h | awk '$1 == "metabuli" && $2 == "Version:" {{print $3; exit}}')
+            if [ -z "$version" ]; then echo "Could not determine Metabuli version" >&2; exit 1; fi
+            echo "metabuli,${{version}}" >> {loc}/{sample}/tmp/dep_mmlong2-proc.csv
+        fi
         """
 
 rule Taxonomy_rrna:
