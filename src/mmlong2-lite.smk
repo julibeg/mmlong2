@@ -840,10 +840,18 @@ rule Binning_prep_innit:
         grep ">" {output.contigs} | cut -c2- > {output.id3}
         
         head -n1 {input.cov1} > {output.cov1}
-        awk 'BEGIN{{FS=OFS="\t"}} NR==FNR{{list[$1]; next}} $1 in list' {output.id3} {input.cov1} | sort >> {output.cov1}
+        awk 'BEGIN{{FS=OFS="\t"}}
+             NR==FNR{{if (FNR > 1) cov[$1]=$0; next}}
+             $1 in cov{{print cov[$1]; next}}
+             {{print "Missing coverage for " $1 > "/dev/stderr"; missing=1}}
+             END{{exit missing}}' {input.cov1} {output.id3} >> {output.cov1}
 
         head -n1 {input.cov2} > {output.cov2}
-        awk 'BEGIN{{FS=OFS="\t"}} NR==FNR{{list[$1]; next}} $1 in list' {output.id3} {input.cov2} | sort >> {output.cov2}
+        awk 'BEGIN{{FS=OFS="\t"}}
+             NR==FNR{{if (FNR > 1) cov[$1]=$0; next}}
+             $1 in cov{{print cov[$1]; next}}
+             {{print "Missing coverage for " $1 > "/dev/stderr"; missing=1}}
+             END{{exit missing}}' {input.cov2} {output.id3} >> {output.cov2}
         """
 
 rule Binning_prep_main:
@@ -867,12 +875,21 @@ rule Binning_prep_main:
         
         comm -23 <(sort {loc}/{sample}/tmp/binning/round_{params.round_prev}/contigs.txt) <(sort {loc}/{sample}/tmp/binning/round_{params.round_prev}/binned.txt) > {output.id}
         seqkit grep -f {output.id} {loc}/{sample}/tmp/binning/round_{params.round_prev}/contigs.fasta | seqkit sort --by-name - > {output.contigs}
+        grep ">" {output.contigs} | cut -c2- > {output.id}
 
         head -n1 {loc}/{sample}/tmp/binning/round_{params.round_prev}/cov.tsv > {output.cov1}
-        awk 'BEGIN{{FS=OFS="\t"}} NR==FNR{{list[$1]; next}} $1 in list' {output.id} {loc}/{sample}/tmp/binning/round_{params.round_prev}/cov.tsv | sort >> {output.cov1}
+        awk 'BEGIN{{FS=OFS="\t"}}
+             NR==FNR{{if (FNR > 1) cov[$1]=$0; next}}
+             $1 in cov{{print cov[$1]; next}}
+             {{print "Missing coverage for " $1 > "/dev/stderr"; missing=1}}
+             END{{exit missing}}' {loc}/{sample}/tmp/binning/round_{params.round_prev}/cov.tsv {output.id} >> {output.cov1}
 
         head -n1 {loc}/{sample}/tmp/binning/round_{params.round_prev}/cov_sub.tsv > {output.cov2}
-        awk 'BEGIN{{FS=OFS="\t"}} NR==FNR{{list[$1]; next}} $1 in list' {output.id} {loc}/{sample}/tmp/binning/round_{params.round_prev}/cov_sub.tsv | sort >> {output.cov2}
+        awk 'BEGIN{{FS=OFS="\t"}}
+             NR==FNR{{if (FNR > 1) cov[$1]=$0; next}}
+             $1 in cov{{print cov[$1]; next}}
+             {{print "Missing coverage for " $1 > "/dev/stderr"; missing=1}}
+             END{{exit missing}}' {loc}/{sample}/tmp/binning/round_{params.round_prev}/cov_sub.tsv {output.id} >> {output.cov2}
         """
 
 rule Binning_metabat2:
