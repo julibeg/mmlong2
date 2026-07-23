@@ -233,7 +233,12 @@ fi
 if [ ! -d $db_metabuli ]
 then
 	echo "Downloading and installing Metabuli database..."
-	wget -r -np -nH --cut-dirs=2 -R "index.html*" -P db_metabuli $dl_metabuli
+	rm -rf db_metabuli.tmp
+	mkdir db_metabuli.tmp
+	wget -O - $dl_metabuli | tar -xzf - -C db_metabuli.tmp --strip-components=1
+	if [ ! -f db_metabuli.tmp/db.parameters ]; then echo "ERROR: Metabuli database archive is invalid" && exit 1; fi
+	rm -rf db_metabuli
+	mv db_metabuli.tmp db_metabuli
 	yq -y -i ".db_metabuli = \"${db_dir}/mmlong2_db_v${version}/db_metabuli\"" $config2
 	echo "Metabuli database installation completed at $(date +'%Y-%d-%m %H:%M:%S')"
 else
