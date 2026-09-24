@@ -1,7 +1,7 @@
 channels:
-  - defaults
   - conda-forge
   - bioconda
+  - nodefaults
 dependencies:
   - gunc=1.0.6
   - nanoq=0.10.0

@@ -1,7 +1,7 @@
 channels:
-  - defaults
   - conda-forge
   - bioconda
+  - nodefaults
 dependencies:
   - tiara=1.0.3
   - whokaryote=1.1.2

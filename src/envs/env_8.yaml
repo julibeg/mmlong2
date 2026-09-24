@@ -1,7 +1,7 @@
 channels:
-  - defaults
   - conda-forge
   - bioconda
+  - nodefaults
 dependencies:
   - checkm2=1.1.0
   - binette=1.2.1

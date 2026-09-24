@@ -1,7 +1,7 @@
 channels:
-  - defaults
   - conda-forge
   - bioconda
+  - nodefaults
 dependencies:
   - flye=2.9.6
   - minimap2=2.30

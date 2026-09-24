@@ -1,6 +1,6 @@
 channels:
-  - defaults
   - conda-forge
   - bioconda
+  - nodefaults
 dependencies:
   - vamb=5.0.4

@@ -1,7 +1,7 @@
 channels:
-  - defaults
   - conda-forge
   - bioconda
+  - nodefaults
 dependencies:
   - longshot=1.0.0
   - samtools=1.22

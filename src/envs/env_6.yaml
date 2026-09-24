@@ -1,6 +1,6 @@
 channels:
-  - defaults
   - conda-forge
   - bioconda
+  - nodefaults
 dependencies:
   - comebin=1.0.4
