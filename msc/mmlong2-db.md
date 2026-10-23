@@ -20,7 +20,7 @@ wget -r -np -nH --cut-dirs=2 -R "index.html*" -P db_metabuli https://hulk.mmseqs
 
 #### GTDB (Genome Taxonomy Database) for microbial genome taxonomy
 ```
-wget -O db_gtdb.tar.gz https://data.ace.uq.edu.au/public/gtdb/data/releases/release226/226.0/auxillary_files/gtdbtk_package/full_package/gtdbtk_r226_data.tar.gz
+wget -O db_gtdb.tar.gz https://data.ace.uq.edu.au/public/gtdb/data/releases/release232/232.0/auxillary_files/gtdbtk_package/full_package/gtdbtk_r232_data.tar.gz
 tar -xvzf db_gtdb.tar.gz
 ```
 
