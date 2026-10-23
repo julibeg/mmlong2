@@ -4,4 +4,4 @@ channels:
   - nodefaults
 dependencies:
   - metamdbg=1.2
-  - myloasm=0.5.1
+  - myloasm=0.7.0

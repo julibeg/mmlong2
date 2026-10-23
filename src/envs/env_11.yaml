@@ -3,5 +3,5 @@ channels:
   - bioconda
   - nodefaults
 dependencies:
-  - gtdbtk=2.6.1
+  - gtdbtk=2.8.0
   - numpy=2.2.6
